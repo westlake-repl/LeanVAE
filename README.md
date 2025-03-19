@@ -48,10 +48,10 @@ bash scripts/eval.sh
 The code and pretrained weights for video generation will be released soon. Stay tuned!
 | Model                    | Dataset      | FVD ⬇️  | Checkpoint 📥                        |
 | ---------- | ---------- | ---------- | ----------- |
-| Latte + LeanVAE-chn4 | SkyTimelapse |49.59 | [sky-chn4.ckpt](https://huggingface.co/) | 
-| Latte + LeanVAE-chn4 | UCF101 |164.45 | [ucf-chn4.ckpt](https://huggingface.co/) |
-| Latte + LeanVAE-chn16 | SkyTimelapse |95.15 | [sky-chn16.ckpt](https://huggingface.co) |
-| Latte + LeanVAE-chn16 | UCF101 |175.33 | [ucf-chn16.ckpt](https://huggingface.co) |
+| Latte + LeanVAE-chn4 | SkyTimelapse |49.59 | sky-chn4.ckpt | 
+| Latte + LeanVAE-chn4 | UCF101 |164.45 | ucf-chn4.ckpt |
+| Latte + LeanVAE-chn16 | SkyTimelapse |95.15 | sky-chn16.ckpt |
+| Latte + LeanVAE-chn16 | UCF101 |175.33 | ucf-chn16.ckpt |
 
 ---
 ## 🔧 **Using LeanVAE in Your Project**
