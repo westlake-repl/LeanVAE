@@ -1,4 +1,4 @@
-<h2 align="center"> <a href="https://arxiv.org/abs">LeanVAE: An Ultra-Efficient Reconstruction VAE for Video Diffusion Models</a></h2>
+<h2 align="center"> <a href="https://arxiv.org/abs/2503.14325">LeanVAE: An Ultra-Efficient Reconstruction VAE for Video Diffusion Models</a></h2>
 
 https://github.com/user-attachments/assets/a2a4814a-192b-4cc4-b1a3-d612caa1d872
 
@@ -45,6 +45,7 @@ bash scripts/eval.sh
 
  
 ### Latte Model:
+The code and pretrained weights for video generation will be released soon. Stay tuned!
 | Model                    | Dataset      | FVD ⬇️  | Checkpoint 📥                        |
 | ---------- | ---------- | ---------- | ----------- |
 | Latte + LeanVAE-chn4 | SkyTimelapse |49.59 | [sky-chn4.ckpt](https://huggingface.co/) | 
@@ -122,7 +123,17 @@ If you find this work useful, consider **starring ⭐ the repository** and citin
 
 ## 📝 **Cite Us**  
 ```bibtex
-
+@misc{cheng2025leanvaeultraefficientreconstructionvae,
+      title={LeanVAE: An Ultra-Efficient Reconstruction VAE for Video Diffusion Models}, 
+      author={Yu Cheng and Fajie Yuan},
+      year={2025},
+      eprint={2503.14325},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV},
+      url={https://arxiv.org/abs/2503.14325}, 
+}
 ```
-
 ---
+
+## 👍 **Acknowledgement**
+Our work benefits from the contributions of several open-source projects, including [OmniTokenizer](https://github.com/FoundationVision/OmniTokenizer), [Open-Sora-Plan](https://github.com/PKU-YuanGroup/Open-Sora-Plan), [VidTok](https://github.com/microsoft/VidTok), and [Latte](https://github.com/Vchitect/Latte). We sincerely appreciate their efforts in advancing research and open-source collaboration!
