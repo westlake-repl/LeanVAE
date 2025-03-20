@@ -43,15 +43,15 @@ bash scripts/eval.sh
 | **LeanVAE-4ch**  | 26.04  | 0.0899  | 39.8M    | 0.203    | [LeanVAE-chn4.ckpt](https://huggingface.co/Yumic/LeanVAE/resolve/main/LeanVAE-dim4.ckpt?download=true) |
 | **LeanVAE-16ch** | 30.15  | 0.0461  | 39.8M    | 0.203    | [LeanVAE-chn16.ckpt](https://huggingface.co/Yumic/LeanVAE/resolve/main/LeanVAE-dim16.ckpt?download=true) |
 
- 
+
 ### Latte Model:
-The code and pretrained weights for video generation will be released soon. Stay tuned!
+The code for video generation will be released soon. Stay tuned!
 | Model                    | Dataset      | FVD ⬇️  | Checkpoint 📥                        |
 | ---------- | ---------- | ---------- | ----------- |
-| Latte + LeanVAE-chn4 | SkyTimelapse |49.59 | sky-chn4.ckpt | 
-| Latte + LeanVAE-chn4 | UCF101 |164.45 | ucf-chn4.ckpt |
-| Latte + LeanVAE-chn16 | SkyTimelapse |95.15 | sky-chn16.ckpt |
-| Latte + LeanVAE-chn16 | UCF101 |175.33 | ucf-chn16.ckpt |
+| Latte + LeanVAE-chn4 | SkyTimelapse |49.59 | [sky-chn4.ckpt](https://huggingface.co/Yumic/LeanVAE/resolve/main/sky-dim4.pt?download=true) | 
+| Latte + LeanVAE-chn4 | UCF101 |164.45 | [ucf-chn4.ckpt](https://huggingface.co/Yumic/LeanVAE/resolve/main/ucf-dim4.pt?download=true) |
+| Latte + LeanVAE-chn16 | SkyTimelapse |95.15 | [sky-chn16.ckpt](https://huggingface.co/Yumic/LeanVAE/resolve/main/sky-dim16.pt?download=true) |
+| Latte + LeanVAE-chn16 | UCF101 |175.33 | [ucf-chn16.ckpt](https://huggingface.co/Yumic/LeanVAE/resolve/main/ucf-dim16.pt?download=true) |
 
 ---
 ## 🔧 **Using LeanVAE in Your Project**
