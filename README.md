@@ -86,9 +86,20 @@ model.set_tile_inference(True)
 model.chunksize_enc = 5
 model.chunksize_dec = 5
 ```
----
+
+------
+
+
+## 🔬 **Further Explorations**
+
+- **Higher Compression Rates**   See [Issue #1](https://github.com/westlake-repl/LeanVAE/issues/1) for related discussion.
+- **Diffusion on Higher Latent Channels**    Refer to *VA-VAE* : [arXiv:2501.01423](https://arxiv.org/abs/2501.01423)  *REPA-E*: [arXiv:2504.10483](https://arxiv.org/abs/2504.10483)
+- **Discrete Latent Space**   Refer to *CODA*: [arXiv:2503.17760](https://arxiv.org/abs/2503.17760)
+
+
 
 ## 📂 **Preparing Data for Training**
+
 To train LeanVAE, you need to create metadata files listing the video paths, grouped by resolution. Each file contains paths to videos of the same resolution.
 ```
 📂 data_list
