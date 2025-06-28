@@ -1,0 +1,12 @@
+#Training
+export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7
+torchrun --nnodes=1 --nproc_per_node=8 train.py --config ./configs/ucf101/ucf101_train.yaml
+
+#Inference
+export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7
+torchrun --nnodes=1 --nproc_per_node=8 sample/sample_ddp.py \
+--config ./configs/ucf101/ucf101_sample.yaml \
+--ckpt  /checkpoints/ucf-chn4.ckpt \
+--save_video_path /results\
+--vae_path ./LeanVAE-chn4.pth 
+

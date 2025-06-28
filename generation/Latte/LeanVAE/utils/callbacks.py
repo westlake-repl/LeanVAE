@@ -98,4 +98,5 @@ class DatasetCallback(Callback):
             trainer.train_dataloader = trainer.video_data._dataloader(train=True, batch_size=self.new_batch_size) #  self.new_batch_size
             print(f'Batch size changed to {self.new_batch_size} at step {self.step_threshold}')
 
+        
   

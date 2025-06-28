@@ -45,7 +45,8 @@ bash scripts/eval.sh
 
 
 ### Latte Model:
-The code for video generation will be released soon. Stay tuned!
+You can find the video generation code in the `generation` folder.
+
 | Model                    | Dataset      | FVD ⬇️  | Checkpoint 📥                        |
 | ---------- | ---------- | ---------- | ----------- |
 | Latte + LeanVAE-chn4 | SkyTimelapse |49.59 | [sky-chn4.ckpt](https://huggingface.co/Yumic/LeanVAE/resolve/main/sky-dim4.pt?download=true) | 

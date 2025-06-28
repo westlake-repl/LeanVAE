@@ -1,0 +1,29 @@
+norm_param: 0.7744  # 0.7744 for LeanVAE-chn4.ckpt   1.0 for LeanVAE-chn16.ckpt
+# model config: 
+model: Latte-XL/2
+num_frames: 17
+image_size: 256 # choices=[256, 512]
+frame_interval: 3
+fixed_spatial: False
+attention_bias: True
+learn_sigma: True
+extras: 2 # [1, 2] 1 unconditional generation, 2 class-conditional generation
+num_classes: 101
+in_channels: 4
+# model speedup
+use_compile: False
+use_fp16: False
+
+# sample config:
+seed:
+sample_method: 'ddpm'
+num_sampling_steps: 250
+cfg_scale: 7.0
+run_time: 12
+num_sample: 1
+sample_names: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+negative_name: 101
+
+# ddp sample config
+per_proc_batch_size: 8
+num_fvd_samples: 2048

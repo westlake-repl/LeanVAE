@@ -1,0 +1,46 @@
+# dataset
+dataset: "ucf101"
+
+data_path: "./UCF101/UCF-101"  
+pretrained_model_path: ""
+vae_path: "./LeanVAE-dim4.ckpt"
+norm_param: 0.7744 # 0.7744 for LeanVAE-chn4.ckpt   1.0 for LeanVAE-chn16.ckpt
+
+# save and load
+results_dir: "./diffusion_ex1"
+pretrained: ""
+
+# model config: 
+model: Latte-XL/2
+num_frames: 17
+image_size: 256 # choices=[256, 512]
+num_sampling_steps: 250
+frame_interval: 3
+fixed_spatial: False
+attention_bias: True
+learn_sigma: True
+extras: 2 # [1, 2] 1 unconditional generation, 2 class-conditional generation
+in_channels: 4
+
+
+# train config:
+save_ceph: True # important
+learning_rate: 1e-4
+ckpt_every: 5000
+clip_max_norm: 0.1
+start_clip_iter: 100000
+local_batch_size: 7 # important
+max_train_steps: 1000000
+global_seed: 3407
+num_workers: 12
+log_every: 50
+lr_warmup_steps: 0
+resume_from_checkpoint:
+gradient_accumulation_steps: 1 # TODO
+num_classes: 101
+
+# low VRAM and speed up training
+use_compile: False
+mixed_precision: False
+enable_xformers_memory_efficient_attention: False
+gradient_checkpointing: False
