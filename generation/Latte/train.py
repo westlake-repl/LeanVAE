@@ -44,7 +44,6 @@ from  LeanVAE import LeanVAE
 #################################################################################
 #                                  Training Loop                                #
 #################################################################################
-vqgan_ckpt ='/mnt/33t/cy/models/sota-ckpt/dim16/epoch=1-step=49999-recon_loss=0.00.ckpt'
 
 def disabled_train(self, mode=True):
     """Overwrite model.train with this function to make sure train/eval mode
