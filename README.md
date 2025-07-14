@@ -4,9 +4,10 @@ https://github.com/user-attachments/assets/a2a4814a-192b-4cc4-b1a3-d612caa1d872
 
 We present **LeanVAE**, a lightweight Video VAE designed for ultra-efficient video compression and scalable generation in Latent Video Diffusion Models (LVDMs).
 
-- **Lightweight & Efficient**: Only **40M parameters**, significantly reducing computational overhead 📉  
-- **Optimized for High-Resolution Videos**: Encodes and decodes a **17-frame 1080p video** in **3 seconds** using only **15GB of GPU memory** *(without tiling inference)* 🎯  
+- **Lightweight & Efficient**: Only **40M parameters**, drastically reducing FLOPs, inference time, and memory usage📉  
+- **Optimized for High-Resolution Videos**: Encodes and decodes a **17-frame 1080p video** in **0.9s / 3.0s** with **6GB / 15GB** of GPU memory (under 4×8×8 / 1×8×8 compression ratios) 🎯  
 - **State-of-the-Art Video Reconstruction**: Competes with leading Video VAEs 🏆  
+- **Robust Support for Long Videos**：Ensures temporal consistency across varying frame lengths and inplement **lossless** temporal tiling inference for flexible processing of long sequences⏱️
 - **Versatile**: Supports both **images and videos**, preserving **causality in latent space** 📽️  
 - **Evidenced by Diffusion Model**: Enhances visual quality in video generation ✨  
 
