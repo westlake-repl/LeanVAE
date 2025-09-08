@@ -25,6 +25,7 @@ pip install -r requirements.txt
 ```bash
 bash scripts/train.sh
 ```
+You can use `pl_ckpt_inference.py` to evaluate checkpoints saved during training. See this [discussion](https://github.com/westlake-repl/LeanVAE/issues/5#issuecomment-3265791491).
 
 **Run Video Reconstruction**
 ```bash
