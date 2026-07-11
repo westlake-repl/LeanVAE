@@ -3,7 +3,7 @@
 import os, hashlib
 import requests
 from tqdm import tqdm
-
+import random
 import torch
 import torch.nn as nn
 from torchvision import models
@@ -82,6 +82,11 @@ class LPIPS(nn.Module):
         return model
 
     def forward(self, input, target):
+        h, w = 128, 256 #b c h w
+        start_h = random.randint(0, input.shape[2] - h)
+        start_w = random.randint(0, input.shape[3] - w)
+        input = input[:, :, start_h:start_h + h, start_w:start_w + w]
+        target = target[:, :, start_h:start_h + h, start_w:start_w + w]
         in0_input, in1_input = (self.scaling_layer(input), self.scaling_layer(target))
         outs0, outs1 = self.net(in0_input), self.net(in1_input)
         feats0, feats1, diffs = {}, {}, {}
