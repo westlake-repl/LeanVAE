@@ -4,13 +4,47 @@ import torch.distributed
 import torch.nn as nn
 import torch.nn.functional as F
 from einops import rearrange
-from ..modules import DiagonalGaussianDistribution, Encoder_Arch, Decoder_Arch, ISTA
+from ..modules import DiagonalGaussianDistribution
+from ..modules.backbones import Encoder_Arch, Decoder_Arch, ISTA
 from ..utils.patcher_utils import Patcher, UnPatcher
+
+class LatentScaler():
+    def __init__(self, dtype=torch.float32):
+        """
+        Args:
+            mean: 1D torch.Tensor, shape [z_dim]
+            std: 1D torch.Tensor, shape [z_dim]
+        """
+        self.mean = torch.tensor(
+           [
+            -0.7571, -0.7089, -0.9113, 0.1075, -0.1745, 0.9653, -0.1517, 1.5508,
+            0.4134, -0.0715, 0.5517, -0.3632, -0.1922, -0.9497, 0.2503, -0.2921
+        ],
+            dtype=dtype,
+        ).view(1, -1, 1, 1, 1) #.to(device=device, dtype=dtype)
+        self.std = torch.tensor(
+            [
+            2.8184, 1.4541, 2.3275, 2.6558, 1.2196, 1.7708, 2.6052, 2.0743,
+            3.2687, 2.1526, 2.8652, 1.5579, 1.6382, 1.1253, 2.8251, 1.9160
+        ],
+            dtype=dtype,
+        ).view(1, -1, 1, 1, 1)  #.to(device=device, dtype=dtype)
+        self.inv_std = 1.0 / self.std
+
+    def enc_norm(self, z: torch.Tensor) -> torch.Tensor:
+        """标准化 (z - mean) / std"""
+        return (z - self.mean.to(z.device)) * self.inv_std.to(z.device)
+
+    def dec_norm(self, z: torch.Tensor) -> torch.Tensor:
+        """反标准化 z * std + mean"""
+        return z * self.std.to(z.device) + self.mean.to(z.device)
 
 class LeanVAE(nn.Module):
     def __init__(self, args):
         super().__init__()
+        args.latent_dim = 16
         self.args = args
+         
         self.embedding_dim = args.embedding_dim
         
         self.latent_bottleneck = ISTA(points_num=args.embedding_dim, out_num=args.latent_dim, iter_num=args.ista_iter_num, layer_num=args.ista_layer_num)
@@ -26,6 +60,7 @@ class LeanVAE(nn.Module):
         self.tile_inference = False
         self.chunksize_enc = args.chunksize_enc if hasattr(args, 'chunksize_enc') and args.chunksize_enc else 5
         self.chunksize_dec = args.chunksize_dec if hasattr(args, 'chunksize_dec') and args.chunksize_dec else 5
+        self.norm = LatentScaler()
         if args.use_tile_inference:
             self.set_tile_inference(True)
         else:
@@ -83,9 +118,11 @@ class LeanVAE(nn.Module):
             z = self.latent_bottleneck.sample(p)
 
         z = rearrange(z, 'b t h w d -> b d t h w') 
+        z = self.norm.enc_norm(z)
         return z
     
     def decode(self, z, is_image = False):
+        z = self.norm.dec_norm(z)
         z = rearrange(z, 'b d t h w -> b t h w d')
         if is_image:
             self.set_tile_inference(False)
@@ -131,10 +168,10 @@ class LeanVAE(nn.Module):
         x_dwt = self.dwt(x) 
         p = self.encoder(x=x_dwt)
         z_mean = self.latent_bottleneck.sample(p)
-        z_std = self.std_layer(p)
+        #z_std = self.std_layer(p)
 
-        posterior = DiagonalGaussianDistribution(parameters=(z_mean, z_std))
-        z = posterior.sample()
+        posterior = z_mean #DiagonalGaussianDistribution(parameters=(z_mean, z_std))
+        z = posterior #.sample()
         p_rec = self.latent_bottleneck.recon(z)
         
         x_dwt_rec = self.decoder(p_rec) #b c t h w
@@ -145,7 +182,7 @@ class LeanVAE(nn.Module):
         if log_image: 
             return x, x_recon
         
-        return x, x_recon, x_dwt, x_dwt_rec, posterior
+        return x, x_recon, self.norm.enc_norm(rearrange(z_mean, 'b t h w d -> b d t h w'))
 
     
     @classmethod
@@ -157,7 +194,6 @@ class LeanVAE(nn.Module):
             raise ValueError("Checkpoint does not contain 'args'. Ensure the checkpoint is saved correctly.")
 
         args = argparse.Namespace(**checkpoint["args"]) 
-        
         model = cls(args)
         if "state_dict" in checkpoint:
             msg = model.load_state_dict(checkpoint["state_dict"], strict=strict)
