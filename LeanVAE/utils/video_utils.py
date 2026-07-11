@@ -76,6 +76,21 @@ class VideoNorm(object):
         re = img.sub_(self.mean).div_(self.std)
         return re
 
+class VideoNormWan(object):
+    """Normalize video to [-1, 1]"""
+
+    def __call__(self, img):
+        """
+        Args:
+            img: float image tensor, (N, 3, H, W)
+        Returns:
+            img: normalized float image tensor in [-1, 1]
+        """
+        if torch.max(img) > 1:   # 说明是 [0, 255]
+            img = img / 255.0
+
+        img = img * 2.0 - 1.0
+        return img
 
 
 
