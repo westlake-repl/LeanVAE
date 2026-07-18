@@ -1,23 +1,22 @@
-"""Load a 4x8x8 compression-ratio, chn=16 (latent_dim=16) LeanVAE checkpoint and
-train it so that its latent space aligns with the Wan2.1 VAE latent space.
+"""Train LeanVAE (4x16x16, latent_dim=48) while aligning its latent space with
+the Wan2.2 VAE latent space.
 
-This is the training entry point of the `align-wan2.1` branch. The wavelet
-patcher input is kept (see LeanVAE/models/autoencoder.py). The alignment losses
-are implemented in LeanVAE/models/autoencoder_pl.py, which loads the Wan2.1 VAE
-(LeanVAE/wan_base/modules/vae_2_1.py -> WanVAE, z_dim=16).
+This is the training entry point of the `align-wan2.2` branch. The model uses the
+restored wavelet-transform input (see LeanVAE/models/autoencoder.py) and the
+alignment losses are implemented in LeanVAE/models/autoencoder_pl.py, which
+loads the Wan2.2 VAE (LeanVAE/wan_base/modules/vae.py -> Wan2_2_VAE).
 
 Example (single node, N GPUs):
     torchrun --nproc_per_node=N leanvae_train.py \
-        --default_root_dir ./output_align_wan2_1 \
+        --default_root_dir ./output_align_wan2_2 \
         --gpus N \
-        --leanvae_ckpt /path/to/leanvae_4x8x8_chn16.pt \
-        --wan_vae_pth /path/to/Wan2.1-T2V-1.3B/Wan2.1_VAE.pth \
-        --grad_clip_val 1.0 --lr 5e-5 --lr_min 2e-5 --warmup_steps 10000 \
-        --discriminator_iter_start 20000 --max_steps 1700000 \
-        --data_path '' --train_datalist data_list --val_datalist data_list \
+        --wan_vae_pth /path/to/Wan2.2-TI2V-5B/Wan2.2_VAE.pth \ 
+        --grad_clip_val 1.0 --lr 5e-5 --lr_min 1e-5 --warmup_steps 5000 \
+        --discriminator_iter_start 100000 --max_steps 1700000 \
+        --data_path '' --train_datalist data_list.csv --val_datalist data_list.csv \
         --batch_size 2 --num_workers 20 --sample_rate 3 --sequence_length 17 \
-        --latent_dim 16 --ista_iter_num 4 --ista_layer_num 2 \
-        --l_dim 128 --h_dim 384 --sep_num_layer 2 --fusion_num_layer 4 \
+        --latent_dim 48 --ista_iter_num 5 --ista_layer_num 2 \
+        --l_dim 128 --h_dim 384 --sep_num_layer 3 --fusion_num_layer 5 \
         --dynamic_sample \
         [--resume_ckpt /path/to/checkpoint.ckpt]
 """
@@ -34,9 +33,11 @@ from LeanVAE.utils.callbacks import VideoLogger, VideoLoggerWan
 
 
 def main():
-    pl.seed_everything(1111)
+    pl.seed_everything(2025)
 
     parser = argparse.ArgumentParser()
+    parser.add_argument('--pretrained', type=str, default=None,
+                        help='Optional path to a pretrained state_dict to warm-start from.')
     parser.add_argument('--resume_ckpt', type=str, default=None,
                         help='Optional PL checkpoint path to resume training from.')
     parser.add_argument('--bf16', action='store_true')
@@ -52,9 +53,39 @@ def main():
     data = VideoData(args)
     model = AutoEncoderEngine(args, data)
 
+    if args.pretrained is not None:
+        load_weights = torch.load(args.pretrained, map_location='cpu')["state_dict"]
+        new_weights = {}
+        for k, v in load_weights.items():
+            # Expand the fused feed-forward Linear of the encoder fusion layer
+            # into the enc_ffd two-Linear form used by the aligned architecture.
+            if "encoder.fusion_layer.ffd_layer" in k and k.endswith(".1.weight"):
+                W_orig = v
+                inner_dim2, dim = W_orig.shape
+                assert inner_dim2 % 2 == 0, "inner_dim2 must be a multiple of 2"
+                inner_dim = inner_dim2 // 2
+
+                A = torch.zeros(inner_dim, dim)
+                A[:, :] = torch.eye(inner_dim)[:, :dim]
+                new_weights[k] = A
+
+                B = torch.zeros(inner_dim * 2, inner_dim)
+                B[:, :dim] = W_orig
+                new_key2 = k.replace(".1.weight", ".2.weight")
+                new_weights[new_key2] = B
+            elif "encoder.fusion_layer.ffd_layer" in k and k.endswith(".4.weight"):
+                new_weights[k.replace(".4.weight", ".5.weight")] = torch.eye(v.shape[1])
+                new_weights[k.replace(".4.weight", ".6.weight")] = v
+            else:
+                new_weights[k] = v
+        msg = model.load_state_dict(new_weights, strict=False)
+        print(f"Model loaded from {args.pretrained}.")
+        print(f"Missing: {msg.missing_keys}")
+        print(f"Unexpected: {msg.unexpected_keys}")
+
     callbacks = []
     callbacks.append(ModelCheckpoint(monitor='train/recon_loss', save_top_k=3, mode='min', filename='latest_checkpoint'))
-    callbacks.append(ModelCheckpoint(every_n_train_steps=5000, save_top_k=-1, filename='{epoch}-{step}-{recon_loss:.2f}'))
+    callbacks.append(ModelCheckpoint(every_n_train_steps=10000, save_top_k=-1, filename='{epoch}-{step}-{recon_loss:.2f}'))
     callbacks.append(LearningRateMonitor(logging_interval='step'))
     print("Log the reconstructed videos...")
     callbacks.append(VideoLogger(batch_frequency=5000, max_videos=4, clamp=True))
