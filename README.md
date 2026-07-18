@@ -32,8 +32,8 @@ video diffusion pipeline. Refer to this [issue](https://github.com/westlake-repl
 
 | Branch | Compression / Channels | Alignment target | 
 | ------ | ---------------------- | ---------------- | 
-| [`align-wan2.1`](#align-wan-2-1) | 4×8×8, `latent_dim=16` | **Wan2.1 VAE** | 
-| [`align-wan2.2`](#align-wan-2-2) | 4×16×16, `latent_dim=48` | **Wan2.2 VAE** | 
+| [`align-wan2.1`](https://github.com/westlake-repl/LeanVAE/tree/align-wan-2-1) | 4×8×8, `latent_dim=16` | **Wan2.1 VAE** | 
+| [`align-wan2.2`](https://github.com/westlake-repl/LeanVAE/tree/align-wan-2-2) | 4×16×16, `latent_dim=48` | **Wan2.2 VAE** | 
 
 ---
 ## 🎯 **Quick Start** 
