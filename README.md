@@ -32,8 +32,8 @@ video diffusion pipeline.
 
 | Branch | Compression / Channels | Alignment target | 
 | ------ | ---------------------- | ---------------- | 
-| [`align-wan2.1`](#branch-align-wan21) | 4×8×8, `latent_dim=16` | **Wan2.1 VAE** (`z_dim=16`) | 
-| [`align-wan2.2`](#branch-align-wan22) | 4×16×16, `latent_dim=48` | **Wan2.2 VAE** | 
+| [`align-wan2.1`](#align-wan-2-1) | 4×8×8, `latent_dim=16` | **Wan2.1 VAE** | 
+| [`align-wan2.2`](#align-wan-2-2) | 4×16×16, `latent_dim=48` | **Wan2.2 VAE** | 
 
 ---
 ## 🎯 **Quick Start** 
