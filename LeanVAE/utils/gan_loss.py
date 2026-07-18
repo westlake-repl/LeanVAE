@@ -75,7 +75,7 @@ def weights_init(m):
 class AdversarialLoss(nn.Module):
     def __init__(
         self,
-        disc_num_layers: int = 3,
+        disc_num_layers: int = 5,
         disc_in_channels: int = 3,
         disc_weight: float = 0.2,
         lecam_loss_weight: float = 0.005,
@@ -86,10 +86,15 @@ class AdversarialLoss(nn.Module):
         super().__init__()
         self.dims = dims
         assert disc_loss in ["hinge", "vanilla"]
-        self.discriminator = NLayerDiscriminator(
-                input_nc=disc_in_channels, n_layers=disc_num_layers, use_actnorm=False
-            ).apply(weights_init)
-        
+        if disc_num_layers == 5:
+            self.discriminator = NLayerDiscriminator(
+                    input_nc=disc_in_channels, n_layers=disc_num_layers, use_actnorm=False
+                ).apply(weights_init)
+        else:
+            self.discriminator = NLayerDiscriminator(
+                    input_nc=disc_in_channels, ndf = 64, n_layers=disc_num_layers, use_actnorm=False
+                ).apply(weights_init)
+
         self.disc_loss = hinge_d_loss if disc_loss == "hinge" else vanilla_d_loss
         self.discriminator_weight = disc_weight
    

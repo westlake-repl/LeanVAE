@@ -111,7 +111,8 @@ def adopt_weight(global_step, threshold=0, value=0.):
 
 def save_video_grid(video, fname, nrow=None, fps=3):
     b, c, t, h, w = video.shape
-    video = video.permute(0, 2, 3, 4, 1).contiguous()
+    video = (video * 0.5 + 0.5).clamp(0, 1)
+    video = video.permute(0, 2, 3, 4, 1).contiguous()  # b t h w c
 
     video = (video.detach().cpu().numpy() * 255).astype('uint8')
     if nrow is None:
