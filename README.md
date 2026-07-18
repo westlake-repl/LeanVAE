@@ -20,6 +20,22 @@ cd LeanVAE
 pip install -r requirements.txt
 ```
 ---
+
+
+## 🌿 **Update(2026/0718) Branches: Wan VAE Latent-Space Alignment**
+
+We update two experimental branches that
+train LeanVAE so that its latent space is **aligned with the latent space of a
+Wan VAE**. Aligning the latents lets a LeanVAE encoder/decoder be used as a
+lightweight, drop-in substitute for the (much heavier) Wan VAE inside a Wan-based
+video diffusion pipeline.
+
+| Branch | Compression / Channels | Alignment target | 
+| ------ | ---------------------- | ---------------- | 
+| [`align-wan2.1`](#branch-align-wan21) | 4×8×8, `latent_dim=16` | **Wan2.1 VAE** (`z_dim=16`) | 
+| [`align-wan2.2`](#branch-align-wan22) | 4×16×16, `latent_dim=48` | **Wan2.2 VAE** | 
+
+---
 ## 🎯 **Quick Start** 
 **Train LeanVAE**
 ```bash
