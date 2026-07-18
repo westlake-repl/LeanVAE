@@ -28,7 +28,7 @@ We update two experimental branches that
 train LeanVAE so that its latent space is **aligned with the latent space of a
 Wan VAE**. Aligning the latents lets a LeanVAE encoder/decoder be used as a
 lightweight, drop-in substitute for the (much heavier) Wan VAE inside a Wan-based
-video diffusion pipeline.
+video diffusion pipeline. Refer to this [issue](https://github.com/westlake-repl/LeanVAE/issues/6#issuecomment-5009796300).
 
 | Branch | Compression / Channels | Alignment target | 
 | ------ | ---------------------- | ---------------- | 
