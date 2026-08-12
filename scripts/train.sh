@@ -16,13 +16,16 @@ CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 python leanvae_train.py \
     --num_workers 12 \
     --sample_rate 1 \
     --sequence_length 17 \
-    --latent_dim 4 \
-    --ista_iter_num 2 \
+    --latent_dim 48 \
+    --ista_iter_num 5 \
     --ista_layer_num 2 \
-    --l_dim 128 \
-    --h_dim 384 \
-    --sep_num_layer 2 \
-    --fusion_num_layer 4 \
+    --l_dim 192 \
+    --h_dim 576 \
+    --embedding_dim 768 \
+    --sep_num_layer 3 \
+    --fusion_num_layer 5 \
+    --patch_size 2 8 8 \
+    --wan_vae_pth "./wan_models/Wan2.2-TI2V-5B/Wan2.2_VAE.pth" \
 
 
 
