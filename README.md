@@ -1,5 +1,5 @@
 # LeanVAE — branch `align-wan2.2`
-
+! Unfinished  to be fixed
 Train a **4×16×16, `latent_dim=48`** LeanVAE aligned with the **Wan2.2 VAE**
 latent space. 
 
