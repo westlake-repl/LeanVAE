@@ -54,6 +54,22 @@ class LatentScaler():
 class LeanVAE(nn.Module):
     def __init__(self, args):
         super().__init__()
+        # --- Wan2.2 alignment: force the latent channel count to 48 to match
+        # the Wan2.2 VAE latent. ---
+        args.latent_dim = 48
+
+        # The overall compression ratio is DWT(2x) composed with the linear
+        # patch. To reach the Wan2.2 4x16x16 ratio we need patch_size=(2,8,8):
+        #   temporal = 2 (DWT) * 2 (patch pt) = 4
+        #   spatial  = 2 (DWT) * 8 (patch ph/pw) = 16
+        # (the original LeanVAE / align-wan2.1 use (2,4,4) -> 4x8x8).
+        patch_size = getattr(args, 'patch_size', (2, 8, 8))
+
+        # The encoder fusion layer outputs (l_dim + h_dim) features, and the ISTA
+        # bottleneck projects from `embedding_dim` points. These MUST match or
+        # the ISTA matmul will fail, so we derive embedding_dim from l_dim/h_dim.
+        args.embedding_dim = args.l_dim + args.h_dim
+
         self.args = args
         self.embedding_dim = args.embedding_dim
 
@@ -67,8 +83,8 @@ class LeanVAE(nn.Module):
         self.dwt = Patcher()
         self.idwt = UnPatcher()
 
-        self.encoder = Encoder_Arch(l_dim = args.l_dim, h_dim = args.h_dim, sep_num_layer = args.sep_num_layer, fusion_num_layer = args.fusion_num_layer)
-        self.decoder = Decoder_Arch(l_dim = args.l_dim, h_dim = args.h_dim, sep_num_layer = args.sep_num_layer, fusion_num_layer = args.fusion_num_layer)
+        self.encoder = Encoder_Arch(l_dim = args.l_dim, h_dim = args.h_dim, sep_num_layer = args.sep_num_layer, fusion_num_layer = args.fusion_num_layer, patch_size = patch_size)
+        self.decoder = Decoder_Arch(l_dim = args.l_dim, h_dim = args.h_dim, sep_num_layer = args.sep_num_layer, fusion_num_layer = args.fusion_num_layer, patch_size = patch_size)
 
         self.std_layer = nn.Linear(args.embedding_dim, args.latent_dim)
 
@@ -224,15 +240,16 @@ class LeanVAE(nn.Module):
         parser = argparse.ArgumentParser(parents=[parent_parser], add_help=False)
 
         # Model architecture parameters
-        parser.add_argument("--embedding_dim", type=int, default=512, help="Dimension of the embedding space.")
-        parser.add_argument("--latent_dim", type=int, default=48, help="Dimension of the latent channel (48 to match Wan2.2 VAE).")
-        parser.add_argument("--ista_iter_num", type=int, default=2, help="Number of iterations in ISTA latent bottleneck.")
+        parser.add_argument("--embedding_dim", type=int, default=768, help="Dimension of the embedding space. Overridden to l_dim + h_dim at model init.")
+        parser.add_argument("--latent_dim", type=int, default=48, help="Dimension of the latent channel (48 to match Wan2.2 VAE). Forced to 48 at model init.")
+        parser.add_argument("--ista_iter_num", type=int, default=5, help="Number of iterations in ISTA latent bottleneck.")
         parser.add_argument("--ista_layer_num", type=int, default=2, help="Number of layers in ISTA latent bottleneck.")
 
-        parser.add_argument("--l_dim", type=int, default=128)
-        parser.add_argument("--h_dim", type=int, default=384)
-        parser.add_argument("--sep_num_layer", type=int, default=2, help="Number of separate processing layers in encoder/decoder.")
-        parser.add_argument("--fusion_num_layer", type=int, default=4, help="Number of fusion layers in encoder/decoder.")
+        parser.add_argument("--l_dim", type=int, default=192)
+        parser.add_argument("--h_dim", type=int, default=576)
+        parser.add_argument("--sep_num_layer", type=int, default=3, help="Number of separate processing layers in encoder/decoder.")
+        parser.add_argument("--fusion_num_layer", type=int, default=5, help="Number of fusion layers in encoder/decoder.")
+        parser.add_argument("--patch_size", type=int, nargs=3, default=(2, 8, 8), help="Linear patch size (pt, ph, pw). With DWT this gives compression 4x16x16 for (2,8,8).")
 
         # Tiling inference (for memory-efficient processing)
         parser.add_argument("--use_tile_inference", action="store_true", help="Enable tiling inference to process video in chunks.")
