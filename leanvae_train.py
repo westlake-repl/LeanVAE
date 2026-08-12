@@ -16,7 +16,8 @@ Example (single node, N GPUs):
         --data_path '' --train_datalist data_list.csv --val_datalist data_list.csv \
         --batch_size 2 --num_workers 20 --sample_rate 3 --sequence_length 17 \
         --latent_dim 48 --ista_iter_num 5 --ista_layer_num 2 \
-        --l_dim 128 --h_dim 384 --sep_num_layer 3 --fusion_num_layer 5 \
+        --l_dim 192 --h_dim 576 --embedding_dim 768 --sep_num_layer 3 --fusion_num_layer 5 \
+        --patch_size 2 8 8 \
         --dynamic_sample \
         [--resume_ckpt /path/to/checkpoint.ckpt]
 """
@@ -55,30 +56,7 @@ def main():
 
     if args.pretrained is not None:
         load_weights = torch.load(args.pretrained, map_location='cpu')["state_dict"]
-        new_weights = {}
-        for k, v in load_weights.items():
-            # Expand the fused feed-forward Linear of the encoder fusion layer
-            # into the enc_ffd two-Linear form used by the aligned architecture.
-            if "encoder.fusion_layer.ffd_layer" in k and k.endswith(".1.weight"):
-                W_orig = v
-                inner_dim2, dim = W_orig.shape
-                assert inner_dim2 % 2 == 0, "inner_dim2 must be a multiple of 2"
-                inner_dim = inner_dim2 // 2
-
-                A = torch.zeros(inner_dim, dim)
-                A[:, :] = torch.eye(inner_dim)[:, :dim]
-                new_weights[k] = A
-
-                B = torch.zeros(inner_dim * 2, inner_dim)
-                B[:, :dim] = W_orig
-                new_key2 = k.replace(".1.weight", ".2.weight")
-                new_weights[new_key2] = B
-            elif "encoder.fusion_layer.ffd_layer" in k and k.endswith(".4.weight"):
-                new_weights[k.replace(".4.weight", ".5.weight")] = torch.eye(v.shape[1])
-                new_weights[k.replace(".4.weight", ".6.weight")] = v
-            else:
-                new_weights[k] = v
-        msg = model.load_state_dict(new_weights, strict=False)
+        msg = model.load_state_dict(load_weights, strict=False)
         print(f"Model loaded from {args.pretrained}.")
         print(f"Missing: {msg.missing_keys}")
         print(f"Unexpected: {msg.unexpected_keys}")
