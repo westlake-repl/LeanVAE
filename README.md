@@ -1,6 +1,4 @@
 # LeanVAE — branch `align-wan2.2`
-! Unfinished  to be fixed
-
 
 Train a **4×16×16, `latent_dim=48`** LeanVAE aligned with the **Wan2.2 VAE**
 latent space. 
@@ -38,8 +36,14 @@ torchrun --nproc_per_node=N leanvae_train.py \
     --data_path '' --train_datalist data_list.csv --val_datalist data_list.csv \
     --batch_size 2 --num_workers 20 --sample_rate 3 --sequence_length 17 \
     --latent_dim 48 --ista_iter_num 5 --ista_layer_num 2 \
-    --l_dim 128 --h_dim 384 --sep_num_layer 3 --fusion_num_layer 5 --dynamic_sample
+    --l_dim 192 --h_dim 576 --embedding_dim 768 --sep_num_layer 3 --fusion_num_layer 5 \
+    --patch_size 2 8 8 --dynamic_sample
 ```
+
+> Note: the 4×16×16 compression comes from the DWT (2×) composed with the
+> linear patch `--patch_size 2 8 8` (temporal `2×2=4`, spatial `2×8=16`).
+> `embedding_dim` must equal `l_dim + h_dim`; it is enforced at model init.
+> `latent_dim` is forced to 48 to match the Wan2.2 VAE latent.
 
 ## Data note
 
